@@ -1,0 +1,17 @@
+<header>
+    <nav>
+        <ul>
+            <li><a href="index">Strona Główna</a></li>
+            <li><a href="game">Gra</a></li>
+            <li><a href="forum">Forum</a></li>
+            <% if (loggedUser) { %>
+                <li><a href="logout">Wyloguj</a></li>
+                <p>Logged in as <%= loggedUser %></p>
+            <% } else { %>
+                    <li><a href="login">Logowanie</a></li>
+                    <li><a href="register">Rejestracja</a></li>
+            <% } %>
+
+        </ul>
+    </nav>
+</header>

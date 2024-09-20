@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <title>login</title>
+  </head>
+  <body>
+    <%- include('includes/menu.ejs') %>
+
+    <main>
+      <div class="login-container">
+        <% if (loggedUser) { %>
+        <h1>Logowanie</h1>
+        <form method="POST">
+          <label for="title">Title:</label><br />
+          <input type="text" id="title" name="title" required /><br /><br />
+
+          <label for="content">Post Content:</label><br />
+          <textarea
+            id="content"
+            name="content"
+            rows="8"
+            cols="40"
+            required
+          ></textarea
+          ><br /><br />
+
+          <input type="submit" value="Submit" />
+        </form>
+        <% if (message) { %>
+        <p><%= message %></p>
+        <% } %> <% } else { %>
+        <h1>Tylko zalogowani użytkownicy mogą dodać nowy post</h1>
+        <% } %>
+      </div>
+    </main>
+
+    <%- include('includes/footer.ejs') %>
+  </body>
+</html>

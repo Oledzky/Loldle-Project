@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <title>Forum</title>
+  </head>
+  <body>
+    <%- include('includes/menu.ejs') %>
+
+    <main>
+      <div class="forum-container">
+        <h1>Forum Dyskusyjne</h1>
+        <a href="addThread"
+          ><button class="new-thread-button">Dodaj Wątek</button></a
+        >
+
+        <div class="thread-list">
+          <% posts.forEach(function(post) { %>
+          <div class="thread">
+            <h2><%= post.title %></h2>
+            <a href="forumThread?id=<%= post._id %>">Czytaj więcej</a>
+          </div>
+          <% }); %>
+        </div>
+        <div>
+          <% if (currentPage != 1) { %>
+          <a href='<%= "/forum?page=" + (currentPage - 1) %>'
+            >Poprzednia strona</a
+          >
+          <% } %> <% if (currentPage < maxPage) { %>
+          <a href='<%= "/forum?page=" + (currentPage + 1) %>'
+            >Następna strona</a
+          >
+          <% } %>
+        </div>
+      </div>
+    </main>
+
+    <%- include('includes/footer.ejs') %>
+  </body>
+</html>

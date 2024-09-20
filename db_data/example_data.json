@@ -1,0 +1,59 @@
+{
+  "users": [
+    {
+      "username": "gracz1",
+      "email": "gracz1@wp.pl",
+      "password": "haslo1"
+    },
+    {
+      "username": "gracz2",
+      "email": "gracz2@gmail.com",
+      "password": "haslo2"
+    },
+    {
+      "username": "gracz3",
+      "email": "gracz3@gry.pl",
+      "password": "haslo3"
+    }
+  ],
+  "posts": [
+    {
+      "author": "gracz1",
+      "title": "title1",
+      "content": "postContent",
+      "comments": [
+        {
+          "author": "gracz2",
+          "content": "komentarz gracza 2",
+          "votes": [
+            {
+              "voter": "gracz1",
+              "isUpvote": true
+            },
+            {
+              "voter": "gracz3",
+              "isUpvote": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "author": "gracz3",
+      "title": "title3",
+      "content": "postContent3",
+      "comments": [
+        {
+          "author": "gracz1",
+          "content": "komentarz gracza 1",
+          "votes": [
+            {
+              "voter": "gracz3",
+              "isUpvote": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>game</title>
+</head>
+<body>
+
+    <%- include('includes/menu.ejs') %>
+
+<main>
+    <div>
+    <h1 id="inGameMessage">Wybierz postać i spróbuj ją odgadnąć:</h1>
+    <div class="search-container" id="searchContainer">
+        <input type="text" list="championsList" class="search-box" id="searchBox" placeholder="Wpisz nazwę bohatera...">
+        <datalist id="championsList">
+                <% allChampions.forEach(champion => { %>
+                    <option value="<%= champion %>"></option>
+                <% }); %>
+        </datalist>
+        <button class="search-button" onclick="processGuess()">Sprawdź</button>
+    </div>
+    <a href="newgame" style="display:none" id="newGameButton"
+    ><button class="new-game">Nowa Gra</button></a
+  >
+            <div class="guess-grid">
+                <div class="attribute-label">Bohater</div>
+                <div class="attribute-label">Płeć</div>
+                <div class="attribute-label">Pozycja(e)</div>
+                <div class="attribute-label">Gatunek</div>
+                <div class="attribute-label">Zasoby</div>
+                <div class="attribute-label">Typ zasięgu</div>
+                <div class="attribute-label">Region(y)</div>
+                <div class="attribute-label">Rok wydania</div>
+            </div>
+            <div id="gameWrapper">
+            <div class="guess-grid">
+                <div class="champion-image iconUnknown"></div>
+                <div class="champion-image iconUnknown"></div>
+                <div class="champion-image iconUnknown"></div>
+                <div class="champion-image iconUnknown"></div>
+                <div class="champion-image iconUnknown"></div>
+                <div class="champion-image iconUnknown"></div>
+                <div class="champion-image iconUnknown"></div>
+                <div class="champion-image iconUnknown"></div>
+            </div> 
+
+            </div>     
+</main>
+
+<%- include('includes/footer.ejs') %>
+
+<script>
+
+    allChampions = <%- unescape(allChampionsString) %>;
+
+    const savedGameId = localStorage.getItem('gameId');
+    <% if (gameId !== undefined) { %>
+      const newGameId = '<%= gameId %>';
+      if (newGameId !== savedGameId) {
+        localStorage.setItem('gameId', '<%= gameId %>');
+        localStorage.setItem('guesses', null)
+      }
+      localStorage.setItem('gameId', '<%= gameId %>');
+      localStorage.setItem('guesses', null)
+    <% } else { %>
+        if (savedGameId === null || savedGameId === undefined) {
+            window.location.href = '/index';
+        } 
+    <% } %>
+
+    function removeChampionOption(valueToRemove) {
+      const datalist = document.getElementById('championsList');
+      const options = datalist.getElementsByTagName('option');
+
+      for (let i = 0; i < options.length; i++) {
+        if (options[i].value === valueToRemove) {
+          options[i].remove();
+          break;
+        }
+      }
+    }
+
+    function createTile(obj) {
+      const color = obj.color;
+      const content = obj.content;
+      return "                <div class=\"attribute " + color + "\">" + content + "</div>\n";
+    }
+
+    function championImgName(champion) {
+        const customNames = {
+            "Nunu & Willump": "Nunu",
+            "Kai'Sa": "Kaisa",
+            "Bel'Veth": "Belveth",
+            "Kha'Zix": "Khazix",
+            "Vel'Koz": "Velkoz"
+        };
+        if (champion in customNames) {
+            return customNames[champion];
+        }
+        return champion.replace(/[^a-zA-Z\&]/g, '');
+    }
+
+    function createRow(data) {
+        var result = "            <div class=\"guess-grid\">\n";
+        result += "                <div class=\"champion-image championIcon\" style=\"background-image: url(\'https://static.bigbrain.gg/assets/lol/riot_static/13.23.1/img/champion/" + championImgName(data.name) + ".webp\')\"></div>\n";
+        result += createTile(data.gender);
+        result += createTile(data.roles);
+        result += createTile(data.species);
+        result += createTile(data.resource);
+        result += createTile(data.rangeType);
+        result += createTile(data.region);
+        result += createTile(data.year);
+        result += "            </div>\n\n";
+        return result;
+    }
+
+    const gameId = localStorage.getItem('gameId');
+    const storedGuesses = JSON.parse(localStorage.getItem('guesses'));
+
+    var allGuesses = []
+    var totalGuesses = 0;
+    var noneGuessYet = (storedGuesses === null || storedGuesses.length === 0);
+    if (!noneGuessYet) {
+        totalGuesses = storedGuesses.length;
+        var initialContent = "";
+        for (const guess of storedGuesses) {
+            removeChampionOption(guess.name);
+            initialContent += createRow(guess);
+        }
+        document.getElementById('gameWrapper').innerHTML = initialContent;
+        allGuesses = storedGuesses;
+        if (allGuesses.length > 0 && allGuesses[allGuesses.length - 1].correct === true) {
+            disableGuessing();
+        }
+    }
+
+    function isKnownChampion(value) {
+      return allChampions.includes(value);
+    }
+
+    function disableGuessing() {
+        document.getElementById('searchContainer').style.display = 'none';
+        document.getElementById('inGameMessage').innerHTML = 'Wygrałeś! Liczba prób: ' + totalGuesses;
+        document.getElementById('newGameButton').style.display = 'block';
+        
+    }
+
+    async function processGuess() {
+        const searchText = searchBox.value;
+        if (!isKnownChampion(searchText)) {
+            return;
+        }
+        removeChampionOption(searchText);
+        const response = await fetch('/guess?answer=' + encodeURIComponent(searchText) + "&gameId=" + gameId);
+        const data = await response.json();
+        searchBox.value = "";
+        totalGuesses++;
+        if (noneGuessYet) {
+            document.getElementById('gameWrapper').innerHTML = createRow(data);
+            noneGuessYet = false;
+        } else {
+            document.getElementById('gameWrapper').innerHTML += createRow(data);
+        }
+        allGuesses.push(data);
+        localStorage.setItem('guesses', JSON.stringify(allGuesses));
+        if (data.correct) {
+            disableGuessing();
+        }
+    }
+
+    const searchBox = document.getElementById('searchBox');
+    searchBox.addEventListener('keypress', async function(event) {
+      if (event.key === 'Enter') {
+        processGuess();
+      }
+    });
+
+</script>
+
+</body>
+</html>

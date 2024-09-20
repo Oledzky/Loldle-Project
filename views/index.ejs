@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <title>s20514_TIN</title>
+  </head>
+  <body>
+    <%- include('includes/menu.ejs') %>
+
+    <main>
+        <div class="main-content">
+          <section>
+            <p>
+              Sprawdź swoją wiedzę o bohaterach z League of Legends!
+            </p>
+
+            <a href="newgame"
+            ><button class="new-game">Nowa Gra</button></a
+          >
+        </section>
+      </div>
+    
+            <a href="game"
+              ><button class="start-game">Kontynuuj</button></a
+            >
+          </section>
+        </div>
+
+
+    </main>
+
+    <%- include('includes/footer.ejs') %>
+
+    <script>
+      const savedGameId = localStorage.getItem("gameId");
+      if (savedGameId === null || savedGameId === undefined) {
+        document.getElementById("continueGameButton").style.display = "none";
+      }
+    </script>
+  </body>
+</html>

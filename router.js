@@ -1,0 +1,43 @@
+const express = require("express");
+const router = express.Router();
+
+const homeController = require("./controllers/home");
+const forumController = require("./controllers/forum");
+const forumThreadController = require("./controllers/forumThread");
+const gameController = require("./controllers/game");
+const inGameController = require("./controllers/ingame");
+const loginController = require("./controllers/login");
+const postLoginController = require("./controllers/postLogin");
+const registerController = require("./controllers/register");
+const postRegisterController = require("./controllers/postRegister");
+const logoutController = require("./controllers/logout");
+const addThreadController = require("./controllers/addThread");
+const postAddThreadController = require("./controllers/postAddThread");
+const addCommentController = require("./controllers/addComment");
+const newGameController = require("./controllers/newGame");
+const guessController = require("./controllers/guess");
+const voteController = require("./controllers/vote");
+const listAllDataController = require("./controllers/listAllData");
+const deleteCommentController = require("./controllers/deleteComment");
+
+router.get("/", homeController);
+router.get("/index", homeController);
+router.get("/forum", forumController);
+router.get("/forumThread", forumThreadController);
+router.get("/game", gameController);
+router.get("/ingame1", inGameController);
+router.get("/login", loginController);
+router.post("/login", postLoginController);
+router.get("/register", registerController);
+router.get("/logout", logoutController);
+router.post("/register", postRegisterController);
+router.get("/addThread", addThreadController);
+router.post("/addThread", postAddThreadController);
+router.post("/addComment", addCommentController);
+router.get("/newGame", newGameController);
+router.get("/guess", guessController);
+router.get("/vote", voteController);
+router.get("/all", listAllDataController);
+router.get("/deleteComment", deleteCommentController);
+
+module.exports = router;

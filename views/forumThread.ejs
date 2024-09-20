@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <link rel="stylesheet" href="css/styles.css">
+<head>
+    <meta charset="UTF-8">
+    <title>Wątek</title>
+</head>
+<body>
+
+  <%- include('includes/menu.ejs') %>
+
+    <main>
+        <div class="thread-container">
+            <% if (postExists) { %>
+                <h1><%= postTitle %></h1>
+                <p>Created by <%= createdBy %> at: <%= createdAt %></p><br>
+                <p><%= postContent %></p>
+                
+                <% comments.forEach(function(comment) { %>
+                    <div class="post" comment-id="<%= comment.id %>">
+                        <p>autor: <%= comment.authorName %></p><br>
+                        <p>createdAt: <%= comment.time %></p><br>
+                        <p><%= comment.content %></p>
+                        <div class="post-actions">
+                            <button class="vote-button upvote" comment-id="<%= comment.id %>">+</button>
+                            <span class="vote-count" id="count_<%= comment.id %>"><%= comment.voteScore %></span>
+                            <button class="vote-button downvote" comment-id="<%= comment.id %>">-</button>
+                            <% if (comment.authorName === loggedUser) { %>
+                            <button class="vote-button delete-comment" comment-id="<%= comment.id %>">D</button>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }); %>
+
+                
+                <div class="comment-section">
+                    <% if (loggedUser) { %>
+                    <h2>Dodaj komentarz:</h2>
+                    <form action="/addComment" method="POST">
+                        <input type="hidden" name="postId" value="<%= postId %>">
+                        <textarea class="comment-textarea" id="comment" name="comment" rows="4" cols="50" required></textarea><br><br>
+                        <input class="submit-comment" type="submit" value="Add Comment">
+                    </form>
+                    <% } %>
+                </div>
+            <% } else { %>
+                <h1>Nie znaleziono postu</h1>
+            <% } %>
+
+        </div>
+  
+    <%- include('includes/footer.ejs') %>
+
+    <script>
+        const loggedUsername = '<%= loggedUser %>';
+
+        async function vote(event, isUpvote) {
+            if (loggedUsername.length === 0) {
+                alert('Tylko zalogowani użytkownicy mogą głosować!');
+                return;
+            }
+            const commentId = event.target.getAttribute('comment-id');
+            const response = await fetch('/vote?isUpvote=' + isUpvote +'&commentId=' + commentId + "&username=" + loggedUsername);
+            const voteDiff = await response.json();
+            const previousVotes = parseInt(document.getElementById('count_' + commentId).innerHTML);
+            const newVotes = previousVotes + voteDiff;
+            document.getElementById('count_' + commentId).innerHTML = newVotes;
+        }
+
+        async function upvote(event) {
+            await vote(event, 1);
+        }
+
+        async function downvote(event) {
+            await vote(event, 0);
+        }
+
+        async function deleteComment(event, isUpvote) {
+            const commentId = event.target.getAttribute('comment-id');
+            const response = await fetch('/deleteComment?commentId=' + commentId);
+            if (!response.ok) {
+                return;
+            } else {
+                document.querySelectorAll('.post').forEach((commentSection) => { 
+                const currentCommentId = commentSection.getAttribute('comment-id');
+                if (currentCommentId === commentId) {
+                    commentSection.style.display = "none";
+                }
+            });
+            }
+        }
+
+        document.querySelectorAll('.upvote').forEach((button) => { button.addEventListener('click', upvote);
+        });
+        document.querySelectorAll('.downvote').forEach((button) => { button.addEventListener('click', downvote);
+        });
+        document.querySelectorAll('.delete-comment').forEach((button) => { button.addEventListener('click', deleteComment);
+        });
+        
+    </script>
+</body>
+</html>
